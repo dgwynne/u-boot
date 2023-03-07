@@ -2,12 +2,15 @@
 /*
  * (C) Copyright 2015 Google, Inc
  *
- * (C) Copyright 2008-2014 Rockchip Electronics
+ * (C) Copyright 2008-2023 Rockchip Electronics
  * Peter, Software Engineering, <superpeter.cai@gmail.com>.
+ * Jianqun Xu, Software Engineering, <jay.xu@rock-chips.com>.
  */
 
 #include <common.h>
 #include <dm.h>
+#include <dm/of_access.h>
+#include <dm/device_compat.h>
 #include <syscon.h>
 #include <linux/errno.h>
 #include <asm/gpio.h>
@@ -23,6 +26,35 @@ enum {
 
 #define OFFSET_TO_BIT(bit)	(1UL << (bit))
 
+/*
+ * Newer Rockchip devices have additional registers that must be
+ * accounted for.
+ */
+#if defined(CONFIG_ROCKCHIP_RK3568)
+#define GPIO_VER			2
+#define REG_L(R)	(R##_l)
+#define REG_H(R)	(R##_h)
+#define READ_REG(REG)	((readl(REG_L(REG)) & 0xFFFF) | \
+			((readl(REG_H(REG)) & 0xFFFF) << 16))
+#define WRITE_REG(REG, VAL)	\
+{\
+	writel(((VAL) & 0xFFFF) | 0xFFFF0000, REG_L(REG)); \
+	writel((((VAL) & 0xFFFF0000) >> 16) | 0xFFFF0000, REG_H(REG));\
+}
+#define CLRBITS_LE32(REG, MASK)	WRITE_REG(REG, READ_REG(REG) & ~(MASK))
+#define SETBITS_LE32(REG, MASK)	WRITE_REG(REG, READ_REG(REG) | (MASK))
+#define CLRSETBITS_LE32(REG, MASK, VAL)	WRITE_REG(REG, \
+				(READ_REG(REG) & ~(MASK)) | (VAL))
+
+#else
+#define GPIO_VER			1
+#define READ_REG(REG)			readl(REG)
+#define WRITE_REG(REG, VAL)		writel(VAL, REG)
+#define CLRBITS_LE32(REG, MASK)		clrbits_le32(REG, MASK)
+#define SETBITS_LE32(REG, MASK)		setbits_le32(REG, MASK)
+#define CLRSETBITS_LE32(REG, MASK, VAL)	clrsetbits_le32(REG, MASK, VAL)
+#endif
+
 struct rockchip_gpio_priv {
 	struct rockchip_gpio_regs *regs;
 	struct udevice *pinctrl;
@@ -35,7 +67,7 @@ static int rockchip_gpio_direction_input(struct udevice *dev, unsigned offset)
 	struct rockchip_gpio_priv *priv = dev_get_priv(dev);
 	struct rockchip_gpio_regs *regs = priv->regs;
 
-	clrbits_le32(&regs->swport_ddr, OFFSET_TO_BIT(offset));
+	CLRBITS_LE32(&regs->swport_ddr, OFFSET_TO_BIT(offset));
 
 	return 0;
 }
@@ -47,8 +79,8 @@ static int rockchip_gpio_direction_output(struct udevice *dev, unsigned offset,
 	struct rockchip_gpio_regs *regs = priv->regs;
 	int mask = OFFSET_TO_BIT(offset);
 
-	clrsetbits_le32(&regs->swport_dr, mask, value ? mask : 0);
-	setbits_le32(&regs->swport_ddr, mask);
+	CLRSETBITS_LE32(&regs->swport_dr, mask, value ? mask : 0);
+	SETBITS_LE32(&regs->swport_ddr, mask);
 
 	return 0;
 }
@@ -68,7 +100,7 @@ static int rockchip_gpio_set_value(struct udevice *dev, unsigned offset,
 	struct rockchip_gpio_regs *regs = priv->regs;
 	int mask = OFFSET_TO_BIT(offset);
 
-	clrsetbits_le32(&regs->swport_dr, mask, value ? mask : 0);
+	CLRSETBITS_LE32(&regs->swport_dr, mask, value ? mask : 0);
 
 	return 0;
 }
@@ -86,14 +118,14 @@ static int rockchip_gpio_get_function(struct udevice *dev, unsigned offset)
 	ret = pinctrl_get_gpio_mux(priv->pinctrl, priv->bank, offset);
 	if (ret)
 		return ret;
-	is_output = readl(&regs->swport_ddr) & OFFSET_TO_BIT(offset);
+	is_output = READ_REG(&regs->swport_ddr) & OFFSET_TO_BIT(offset);
 
 	return is_output ? GPIOF_OUTPUT : GPIOF_INPUT;
 #endif
 }
 
 /* Simple SPL interface to GPIOs */
-#ifdef CONFIG_SPL_BUILD
+#if defined(CONFIG_SPL_BUILD) && (GPIO_VER == 1)
 
 enum {
 	PULL_NONE_1V8 = 0,
@@ -143,7 +175,7 @@ static int rockchip_gpio_probe(struct udevice *dev)
 	struct gpio_dev_priv *uc_priv = dev_get_uclass_priv(dev);
 	struct rockchip_gpio_priv *priv = dev_get_priv(dev);
 	struct ofnode_phandle_args args;
-	char *end;
+	char *end = NULL;
 	int ret;
 
 	priv->regs = dev_read_addr_ptr(dev);
