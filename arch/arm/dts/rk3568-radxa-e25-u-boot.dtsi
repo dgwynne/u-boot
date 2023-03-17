@@ -18,18 +18,18 @@
 			system {
 				manufacturer = "Radxa";
 				product = "E25";
-                        };
+			};
 
 			baseboard {
 				manufacturer = "Radxa";
 				product = "Compute Module 3 Industrial";
 			};
 
-                        chassis {
-                                manufacturer = "Radxa";
-                        };
-                };
-        };
+			chassis {
+				manufacturer = "Radxa";
+			};
+		};
+	};
 
 };
 
