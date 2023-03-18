@@ -381,6 +381,7 @@ static ulong rk3568_pmuclk_get_rate(struct clk *clk)
 		rate = rk3568_pmu_get_pmuclk(priv);
 		break;
 	default:
+		printf("%s: clk id %ld not handled!\n", __func__, clk->id);
 		return -ENOENT;
 	}
 
@@ -425,6 +426,8 @@ static ulong rk3568_pmuclk_set_rate(struct clk *clk, ulong rate)
 		ret = rk3568_pmu_set_pmuclk(priv, rate);
 		break;
 	default:
+		printf("%s: clk id %ld (rate %ld) not handled!\n", __func__,
+		    clk->id, rate);
 		return -ENOENT;
 	}
 
@@ -452,6 +455,7 @@ static int rk3568_pmuclk_set_parent(struct clk *clk, struct clk *parent)
 	case CLK_RTC_32K:
 		return rk3568_rtc32k_set_parent(clk, parent);
 	default:
+		printf("%s: clk id %ld not handled!\n", __func__, clk->id);
 		return -ENOENT;
 	}
 }
@@ -2487,6 +2491,7 @@ static ulong rk3568_clk_get_rate(struct clk *clk)
 		rate = rk3568_cpll_div_get_rate(priv, clk->id);
 		break;
 	default:
+		printf("%s: clk id %ld not handled!\n", __func__, clk->id);
 		return -ENOENT;
 	}
 
@@ -2672,6 +2677,8 @@ static ulong rk3568_clk_set_rate(struct clk *clk, ulong rate)
 		ret = rk3568_cpll_div_set_rate(priv, clk->id, rate);
 		break;
 	default:
+		printf("%s: clk id %ld (rate %ld) not handled!\n", __func__,
+		    clk->id, rate);
 		return -ENOENT;
 	}
 
@@ -2835,6 +2842,7 @@ static int rk3568_clk_set_parent(struct clk *clk, struct clk *parent)
 	case CLK_RKVDEC_CORE:
 		return rk3568_rkvdec_set_parent(clk, parent);
 	default:
+		printf("%s: clk id %ld not handled!\n", __func__, clk->id);
 		return -ENOENT;
 	}
 
