@@ -152,21 +152,6 @@
 		};
 	};
 
-	regulator {
-//		gpio0_b7: gpio0-b7 {
-//			rockchip,pins = <0 RK_PB7 RK_FUNC_GPIO &pcfg_pull_none>;
-//		};
-//		gpio0_c5: gpio0-c5 {
-//			rockchip,pins = <0 RK_PC5 RK_FUNC_GPIO &pcfg_pull_none>;
-//		};
-//		gpio0_c7: gpio0-c7 {
-//			rockchip,pins = <0 RK_PC7 RK_FUNC_GPIO &pcfg_pull_none>;
-//		};
-//		gpio3_a7: gpio3-a7 {
-//			rockchip,pins = <3 RK_PA7 RK_FUNC_GPIO &pcfg_pull_none>;
-//		};
-	};
-
 	usb {
 		minipcie_enable_h: minipcie-enable-h {
 			rockchip,pins = <3 RK_PA7 RK_FUNC_GPIO &pcfg_pull_none>;
