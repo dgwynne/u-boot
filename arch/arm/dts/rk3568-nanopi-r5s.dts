@@ -494,6 +494,11 @@
 		pinctrl-0 = <&hym8563_int>;
 		wakeup-source;
 	};
+
+	eeprom@53 {
+		compatible = "at,24c08", "i2c-eeprom";
+		reg = <0x53>;
+	};
 };
 
 &i2s0_8ch {
