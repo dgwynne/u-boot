@@ -226,6 +226,10 @@
 	status = "okay";
 };
 
+&sata1 {
+	status = "okay";
+};
+
 /* MiniPCIe */
 &usb2phy1_otg {
 	phy-supply = <&vcc3v3_minipcie>;
