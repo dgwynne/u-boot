@@ -202,7 +202,40 @@
 	status = "okay";
 };
 
+/* USB30_A */
 &usb_host0_xhci {
 	extcon = <&usb2phy0>;
+	status = "okay";
+};
+
+&usb2phy1 {
+	status = "okay";
+};
+
+/* NGFF B-KEY */
+&usb2phy1_host {
+	phy-supply = <&vcc3v3_pcie30x1>;
+	status = "okay";
+};
+
+&usb_host0_ehci {
+	status = "okay";
+};
+
+&usb_host0_ohci {
+	status = "okay";
+};
+
+/* MiniPCIe */
+&usb2phy1_otg {
+	phy-supply = <&vcc3v3_minipcie>;
+	status = "okay";
+};
+
+&usb_host1_ehci {
+	status = "okay";
+};
+
+&usb_host1_ohci {
 	status = "okay";
 };
