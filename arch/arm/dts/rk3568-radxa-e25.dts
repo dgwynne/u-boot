@@ -98,6 +98,10 @@
 	};
 };
 
+&rng {
+	status = "okay";
+};
+
 &pcie2x1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pcie20_perstn_m2>;
