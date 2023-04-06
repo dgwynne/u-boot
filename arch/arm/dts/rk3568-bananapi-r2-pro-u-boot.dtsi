@@ -8,7 +8,7 @@
 / {
 	chosen {
 		stdout-path = &uart2;
-		u-boot,spl-boot-order = "same-as-spl", &sdhci;
+		u-boot,spl-boot-order = "same-as-spl", &sdmmc0, &sdhci;
 	};
 
 	smbios {
@@ -31,10 +31,6 @@
 		};
 	};
 
-};
-
-&sdmmc0 {
-	status = "okay";
 };
 
 &uart2 {
