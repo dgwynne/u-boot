@@ -190,6 +190,10 @@
 	};
 };
 
+&rng {
+	status = "okay";
+};
+
 &combphy0 {
 	/* used for USB3 */
 	status = "okay";
