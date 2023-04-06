@@ -232,6 +232,7 @@
 };
 
 &gmac1 {
+	label = "wan";
 	assigned-clocks = <&cru SCLK_GMAC1_RX_TX>, <&cru SCLK_GMAC1>;
 	assigned-clock-parents = <&cru SCLK_GMAC1_RGMII_SPEED>, <&cru CLK_MAC1_2TOP>;
 	clock_in_out = "output";
