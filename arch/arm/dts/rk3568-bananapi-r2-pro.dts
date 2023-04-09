@@ -537,7 +537,7 @@
 
 	switch@0 {
 		compatible = "mediatek,mt7531";
-		reg = <0>;
+		reg = <31>;
 
 		ports {
 			#address-cells = <1>;
